@@ -1,13 +1,14 @@
 mod graph;
 mod product;
 
+
 use graph::ProductGraph;
 use product::Product;
-use rand::{seq::SliceRandom, Rng};
+use rand::prelude::*; // Importa todos os traits necessários, incluindo SliceRandom e Rng
 
 fn main() {
     let mut graph = ProductGraph::new();
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::thread_rng(); // Mantém a função correta para gerar o RNG
 
     // Geração de 1000 produtos com nomes variados
     let categories = vec!["Eletrônicos", "Vestuário", "Decoração", "Alimentos", "Esportes"];
