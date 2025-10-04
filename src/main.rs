@@ -3,51 +3,67 @@ mod product;
 
 use graph::ProductGraph;
 use product::Product;
+use rand::{seq::SliceRandom, Rng};
 
 fn main() {
     let mut graph = ProductGraph::new();
+    let mut rng = rand::thread_rng();
 
-    // Produtos de exemplo
-    let smartphone = Product {
-        id: 1,
-        name: "Smartphone X".to_string(),
-        brand: "TechBrand".to_string(),
-        category: "Eletrônicos".to_string(),
-    };
+    // Geração de 1000 produtos com nomes variados
+    let categories = vec!["Eletrônicos", "Vestuário", "Decoração", "Alimentos", "Esportes"];
+    let brands = vec!["TechBrand", "StyleCo", "HomeLux", "Foodies", "SportPro"];
+    let mut products = Vec::new();
 
-    let capinha = Product {
-        id: 2,
-        name: "Capinha X".to_string(),
-        brand: "TechBrand".to_string(),
-        category: "Acessórios".to_string(),
-    };
+    for id in 1..=1000 {
+        let category = categories.choose(&mut rng).unwrap().to_string();
+        let brand = brands.choose(&mut rng).unwrap().to_string();
+        let name = format!("Produto {} - {}", id, category);
 
-    let carregador = Product {
-        id: 3,
-        name: "Carregador Turbo".to_string(),
-        brand: "PowerPlus".to_string(),
-        category: "Acessórios".to_string(),
-    };
+        let product = Product {
+            id,
+            name,
+            brand,
+            category,
+        };
 
-    // Adiciona produtos ao grafo
-    graph.add_product(smartphone.clone());
-    graph.add_product(capinha.clone());
-    graph.add_product(carregador.clone());
-
-    // Define relações entre produtos
-    graph.add_edge(smartphone.id, capinha.id);
-    graph.add_edge(smartphone.id, carregador.id);
-
-    // Busca por nome
-    println!("🔍 Resultados da busca por 'smartphone':");
-    for p in graph.search_by_name("smartphone") {
-        println!("{:?}", p);
+        graph.add_product(product.clone());
+        products.push(product);
     }
 
-    // Recomendações
-    println!("\n🤝 Recomendações para '{}':", smartphone.name);
-    for p in graph.recommend(smartphone.id) {
-        println!("{:?}", p);
+    // Criar conexões aleatórias entre produtos (recomendações)
+    for product in &products {
+        let num_recs = rng.gen_range(2..6); // cada produto recomenda de 2 a 5 outros
+        let recs = products.choose_multiple(&mut rng, num_recs);
+
+        for rec in recs {
+            if product.id != rec.id {
+                graph.add_edge(product.id, rec.id);
+            }
+        }
+    }
+
+    // Simular buscas por palavras-chave e mostrar recomendações
+    let keywords = vec!["produto 10", "produto 500", "produto 999", "eletrônicos", "alimentos"];
+
+    for keyword in keywords {
+        println!("\n🔍 Busca por '{}':", keyword);
+        let results = graph.search_by_name(keyword);
+
+        if results.is_empty() {
+            println!("Nenhum produto encontrado.");
+        } else {
+            for product in results {
+                println!("→ {:?}", product);
+                let recs = graph.recommend(product.id);
+                if recs.is_empty() {
+                    println!("   ⚠️ Nenhuma recomendação disponível.");
+                } else {
+                    println!("   💡 Recomendações:");
+                    for rec in recs {
+                        println!("     - {:?}", rec);
+                    }
+                }
+            }
+        }
     }
 }
-
