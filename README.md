@@ -37,7 +37,6 @@
     ```bash
     cargo build --release
 
-
 5. Execute o projeto:
    ```bash
     cargo run
@@ -56,14 +55,13 @@ Recomendações: O sistema pode gerar recomendações baseadas nos dados de busc
 
 Exemplo de Uso
      ```bash
-     
      use megastore_search::search_product;
         
-        let produtos = search_product("nome_do_produto");
+    let produtos = search_product("nome_do_produto");
         
-        for produto in produtos {
-             println!("{}", produto.nome);
-       }
+    for produto in produtos {
+        println!("{}", produto.nome);
+    }
 
 Parâmetros de Busca
 
